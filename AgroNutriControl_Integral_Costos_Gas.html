@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AgroNutriControl Integral</title>
+<style>
+:root{--bg:#eef3f8;--card:#fff;--ink:#172033;--muted:#5c687a;--line:#d8e1ec;--blue:#155eef;--teal:#087f8c;--red:#b42318;--amber:#8a4b00;--green:#067647}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}header{background:linear-gradient(120deg,#10264b,#155eef);color:#fff;padding:24px clamp(14px,3vw,36px)}header h1{margin:0 0 6px;font-size:clamp(1.4rem,3vw,2rem)}header p{margin:0;color:#e2eaff;max-width:1100px}main{max-width:1600px;margin:auto;padding:16px}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}.tab{background:#fff;border:1px solid var(--line);padding:10px 13px;border-radius:9px;cursor:pointer;font-weight:750;color:var(--ink)}.tab.active{background:var(--blue);border-color:var(--blue);color:#fff}.pane{display:none}.pane.active{display:block}.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:16px;margin-bottom:14px;box-shadow:0 3px 12px #10264b08}h2{font-size:1.15rem;margin:0 0 12px}h3{font-size:1rem;margin:18px 0 8px}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.field{display:flex;flex-direction:column;gap:4px;min-width:0}.field label{font-size:.84rem;font-weight:700}.field small,.muted{color:var(--muted);font-size:.82rem}input,select{width:100%;min-width:0;padding:8px 9px;border:1px solid #bcc9d9;border-radius:7px;background:#fff;color:var(--ink);font:inherit}input:focus,select:focus{outline:2px solid #a9c5ff;border-color:var(--blue)}button{border:0;border-radius:8px;padding:9px 13px;font:inherit;font-weight:750;cursor:pointer}.primary{background:var(--blue);color:white}.secondary{background:#e8eef8;color:var(--ink)}.danger{background:#fee4e2;color:#912018}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.notice{background:#fff8e8;border:1px solid #f2d18b;color:#6d4700;border-radius:8px;padding:11px;margin:10px 0}.tablewrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.84rem}th,td{text-align:left;padding:7px;border-bottom:1px solid var(--line);vertical-align:middle}th{background:#f3f6fa;white-space:nowrap}td input,td select{min-width:75px;padding:6px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.stat{border:1px solid var(--line);border-radius:9px;padding:11px}.stat span{display:block;color:var(--muted);font-size:.8rem}.stat b{font-size:1.2rem;overflow-wrap:anywhere}.interpret{background:#f4f7fb;border-radius:8px;padding:10px;margin:8px 0}.good{color:var(--green)}.bad{color:var(--red)}.label-preview{max-width:500px;border:2px solid #111;background:#fff;color:#111;padding:13px;font-family:Arial,sans-serif}.label-preview h2{font-size:1.8rem;font-weight:900;border-bottom:7px solid #111;margin:0}.nutrient{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #111;padding:4px}.nutrient.major{border-bottom:4px solid #111;font-size:1.1rem}.sealrow{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.seal{width:88px;height:88px;background:#111;color:#fff;clip-path:polygon(14% 0,86% 0,100% 14%,100% 86%,86% 100%,14% 100%,0 86%,0 14%);display:flex;align-items:center;justify-content:center;text-align:center;font-size:.7rem;font-weight:900;padding:9px}.chartbox{height:300px;border:1px solid var(--line);border-radius:9px;padding:6px}.chartbox canvas{width:100%;height:100%;display:block}.flow{display:flex;flex-direction:column;align-items:stretch;gap:6px}.flowrow{display:grid;grid-template-columns:1fr 32px 1fr;align-items:center;gap:8px}.flowbox{border:1px solid #a9bed8;border-radius:8px;padding:9px;background:#f8fbff}.flowbox strong{display:block}.arrow{text-align:center;font-size:1.5rem;color:var(--blue)}.branch{font-size:.82rem;color:var(--amber);margin-top:4px}.pill{display:inline-block;border-radius:18px;padding:3px 8px;background:#e7edf7;font-size:.8rem;font-weight:700}.footer{color:var(--muted);font-size:.8rem;padding:10px 0}
+@media(max-width:1000px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){main{padding:9px}.card{padding:12px}.grid,.grid.two{grid-template-columns:1fr}.flowrow{grid-template-columns:1fr 22px 1fr}.seal{width:74px;height:74px}}
+@media print{header,.tabs,.noprint,.notice{display:none!important}body{background:#fff}main{padding:0}.pane{display:none!important}#nutri{display:block!important}.card{box-shadow:none;border:0}.label-preview{margin:auto}}
+</style>
+</head>
+<body>
+<header><h1>AgroNutriControl Integral</h1><p>Simulador unificado para formulación y etiqueta nutrimental, control estadístico, costos de producción y balance de materia en hasta 15 etapas. Diseñado como herramienta educativa para procesos de alimentos.</p></header>
+<main>
+<nav class="tabs noprint">
+<button class="tab active" data-pane="nutri">1. Fórmula y etiqueta</button>
+<button class="tab" data-pane="control">2. Gráficas de control</button>
+<button class="tab" data-pane="costos">3. Costos y punto de equilibrio</button>
+<button class="tab" data-pane="balance">4. Balance de materia</button>
+<button class="tab" data-pane="interpretacion">5. Interpretación</button>
+<button class="tab" data-pane="gasTab">6. Consumo de gas LP</button>
+</nav>
+<section id="nutri" class="pane active">
+<div class="card">
+<h2>Datos del producto y fórmula de ingredientes</h2>
+<div class="grid">
+<div class="field"><label>Producto</label><input id="producto" value="Producto alimenticio"></div>
+<div class="field"><label>Marca</label><input id="marca" placeholder="Marca (opcional)"></div>
+<div class="field"><label>Porción declarada</label><input id="porcion" type="number" min=".1" value="100" step="any"></div>
+<div class="field"><label>Unidad de porción</label><select id="unidadPorcion"><option>g</option><option>ml</option></select></div>
+<div class="field"><label>Contenido neto por envase</label><input id="contenidoNeto" type="number" min="0" value="100" step="any"></div>
+<div class="field"><label>Unidad de contenido</label><select id="unidadNeto"><option>g</option><option>ml</option></select></div>
+<div class="field"><label>Porciones por envase</label><input id="porciones" type="number" min="0" value="1" step="any"></div>
+<div class="field"><label>Tipo de producto</label><select id="tipoProducto"><option value="solido">Alimento sólido</option><option value="bebida">Bebida no alcohólica</option><option value="liquido">Alimento líquido</option></select></div>
+</div>
+<div class="notice">Captura cada ingrediente y su cantidad total de formulación. Para ingredientes comunes reconocidos (por ejemplo agua, azúcar, harina de trigo, avena, aceite vegetal, leche, huevo y algunas frutas/verduras), al salir del campo se rellenan valores orientativos de una base integrada; para otros ingredientes, introduce la composición nutricional por 100 g o 100 ml (según la base seleccionada). Para convertir ml a g se utiliza la densidad ingresada. La porción se escala respecto a la masa total calculada de la fórmula; para productos líquidos, revise la densidad del producto final si la porción se declara en ml. Los resultados son tan fiables como los datos de composición que proporciones.</div>
+<div class="tablewrap"><table><thead><tr><th>#</th><th>Ingrediente</th><th>Cantidad</th><th>Unidad</th><th>Densidad g/ml</th><th>Base comp.</th><th>Energía kcal</th><th>Proteína g</th><th>Grasa g</th><th>Saturada g</th><th>Trans g</th><th>Carboh. g</th><th>Azúcares g</th><th>Añadidos g</th><th>Fibra g</th><th>Sodio mg</th><th>Costo MXN/kg o L</th><th>Subtotal MXN</th><th>Quitar</th></tr></thead><tbody id="ingredientes"></tbody></table></div>
+<div class="actions noprint"><button class="secondary" id="addIng">+ Añadir ingrediente</button><button class="secondary" id="ejemploIng">Cargar fórmula de ejemplo</button><button class="primary" id="calcNutri">Calcular nutrientes y etiqueta</button><button class="secondary" id="printLabel">Imprimir etiqueta</button><button class="secondary" id="exportIng">Exportar fórmula CSV</button></div>
+<h3>Opciones para sellos y leyendas</h3><div class="grid">
+<div class="field"><label>¿Contiene edulcorantes?</label><select id="edulcorante"><option value="no">No</option><option value="si">Sí</option></select></div>
+<div class="field"><label>¿Contiene cafeína añadida?</label><select id="cafeina"><option value="no">No</option><option value="si">Sí</option></select></div>
+<div class="field"><label>¿Producto con calorías?</label><select id="conCalorias"><option value="si">Sí</option><option value="no">No</option></select></div>
+<div class="field"><label>Factor de conversión energético para carbohidratos (kcal/g)</label><input id="factorCarbo" type="number" value="4" min="0" step="any"></div>
+</div>
+</div>
+<div class="card">
+<h2>Etiqueta nutrimental calculada</h2><div id="sellos" class="sealrow"></div><div id="leyendas" class="muted"></div>
+<div class="label-preview" id="labelPreview"><h2>Información nutrimental</h2><div class="nutrient" id="lblProducto"><strong>Producto alimenticio</strong></div><div class="nutrient" id="lblPorcion">Tamaño de porción: 100 g</div><div class="nutrient" id="lblPorciones">Porciones por envase: 1</div>
+<div class="nutrient major"><strong>Contenido energético</strong><strong id="lblEnergia">0 kcal</strong></div>
+<div class="nutrient"><span>Proteínas</span><strong id="lblProteina">0 g</strong></div><div class="nutrient"><span>Grasas totales</span><strong id="lblGrasa">0 g</strong></div><div class="nutrient"><span>Grasas saturadas</span><strong id="lblSaturada">0 g</strong></div><div class="nutrient"><span>Grasas trans</span><strong id="lblTrans">0 g</strong></div><div class="nutrient"><span>Hidratos de carbono</span><strong id="lblCarbo">0 g</strong></div><div class="nutrient"><span>Azúcares totales</span><strong id="lblAzucares">0 g</strong></div><div class="nutrient"><span>Azúcares añadidos</span><strong id="lblAnadidos">0 g</strong></div><div class="nutrient"><span>Fibra dietética</span><strong id="lblFibra">0 g</strong></div><div class="nutrient"><span>Sodio</span><strong id="lblSodio">0 mg</strong></div>
+<p style="font-size:.73rem;margin-bottom:0">Etiqueta preliminar generada con datos capturados. Validar presentación, redondeo, ingredientes, alérgenos y criterios normativos antes de comercializar.</p></div>
+<div class="interpret" id="nutriResumen">Añade ingredientes y pulsa calcular.</div>
+</div>
+</section>
+<section id="control" class="pane">
+<div class="card"><h2>Registro de 10 muestras y parámetros de control</h2>
+<div class="grid">
+<div class="field"><label>Variable a controlar</label><select id="variable"><option value="peso">Peso / volumen de llenado</option><option value="brix">°Brix</option><option value="ph">pH</option><option value="humedad">Humedad</option><option value="temperatura">Temperatura</option><option value="viscosidad">Viscosidad</option><option value="manual">Variable manual</option></select></div>
+<div class="field"><label>Nombre de variable</label><input id="nombreVariable" value="Peso de llenado"></div>
+<div class="field"><label>Unidad</label><select id="unidadM"><option>g</option><option>ml</option><option>°Brix</option><option>pH</option><option>%</option><option>°C</option><option>mPa·s</option><option>Otra</option></select></div>
+<div class="field"><label>Objetivo nominal</label><input id="objetivo" type="number" value="100" step="any"></div>
+<div class="field"><label>Límite inferior de especificación (LIE)</label><input id="lie" type="number" value="98" step="any"></div>
+<div class="field"><label>Límite superior de especificación (LSE)</label><input id="lse" type="number" value="102" step="any"></div>
+<div class="field"><label>Método de límites de control</label><select id="metodoControl"><option value="sigma">Media ± 3 desviaciones estándar</option><option value="spec">Usar LIE/LSE como límites de alerta</option></select></div>
+</div>
+<div class="tablewrap"><table><thead><tr><th>Muestra</th><th>Valor medido</th><th>Observación</th></tr></thead><tbody id="muestras"></tbody></table></div>
+<div class="actions noprint"><button class="primary" id="calcControl">Calcular estadísticas y gráficas</button><button class="secondary" id="demoControl">Cargar ejemplo</button><button class="secondary" id="clearControl">Limpiar</button><button class="secondary" id="alarmTest">Probar alarma sonora</button><button class="secondary" id="exportControl">Exportar CSV</button></div>
+</div>
+<div class="card"><h2>Resultados estadísticos</h2><div class="stats">
+<div class="stat"><span>Promedio</span><b id="media">—</b></div><div class="stat"><span>Desviación estándar muestral</span><b id="desv">—</b></div><div class="stat"><span>Coeficiente de variación</span><b id="cv">—</b></div><div class="stat"><span>Rango observado</span><b id="rango">—</b></div></div>
+<div class="interpret" id="estadoControl">Capture las muestras y calcule.</div>
+<div class="grid two"><div><h3>Carta de valores individuales</h3><div class="chartbox"><canvas id="chartI" width="900" height="350"></canvas></div><div class="interpret" id="interpretI"></div></div><div><h3>Carta de desviación respecto a la media</h3><div class="chartbox"><canvas id="chartD" width="900" height="350"></canvas></div><div class="interpret" id="interpretD"></div></div></div>
+</div>
+</section>
+<section id="costos" class="pane">
+<div class="card"><h2>Costos de producción de producto terminado</h2>
+<p class="muted">Registra hasta 15 ingredientes directamente en esta pestaña. El costo total de cada ingrediente se calcula como cantidad × costo unitario. La unidad del costo unitario debe coincidir con la unidad seleccionada para la cantidad. Los costos de esta tabla son independientes de la composición nutrimental de la pestaña 1.</p>
+<div class="tablewrap"><table><thead><tr><th>#</th><th>Ingrediente de la fórmula</th><th>Cantidad utilizada</th><th>Unidad</th><th>Costo unitario (MXN por kg, g, L, ml o unidad, según corresponda)</th><th>Costo total (MXN)</th></tr></thead><tbody id="costIngredientsRows"></tbody><tfoot><tr><th colspan="5" style="text-align:right">Costo total de ingredientes</th><th id="costIngredientsSum">$0.00</th></tr></tfoot></table></div>
+<div class="actions noprint"><button class="secondary" id="fillCostRows">Habilitar / restablecer 15 renglones</button><button class="secondary" id="clearCostRows">Limpiar ingredientes</button></div>
+<h3>Otros costos de producción por lote (MXN)</h3><div class="grid">
+<div class="field"><label>Mano de obra directa</label><input id="manoObra" type="number" min="0" value="0" step="any"></div>
+<div class="field"><label>Empaque y etiquetado</label><input id="empaque" type="number" min="0" value="0" step="any"></div>
+<div class="field"><label>Gas LP / energía</label><input id="energiaCosto" type="number" min="0" value="0" step="any"><small>Puedes copiar aquí el costo estimado del gas desde la pestaña Gas LP.</small></div>
+<div class="field"><label>Costos indirectos y otros</label><input id="indirectos" type="number" min="0" value="0" step="any"></div>
+<div class="field"><label>Unidades de producto terminado obtenidas</label><input id="unidades" type="number" min="1" value="1000" step="1"></div>
+<div class="field"><label>Ganancia deseada sobre costo (%)</label><input id="ganancia" type="number" min="0" value="40" step="any"></div>
+<div class="field"><label>Precio de venta manual (MXN/unidad, opcional)</label><input id="precioManual" type="number" min="0" value="0" step="any"><small>Si es mayor que cero, se usa en lugar del precio calculado.</small></div>
+<div class="field"><label>Costos fijos del periodo (MXN)</label><input id="costosFijos" type="number" min="0" value="0" step="any"></div>
+</div>
+<div class="actions noprint"><button class="primary" id="calcCostos">Calcular costos y punto de equilibrio</button><button class="secondary" id="exportCostos">Exportar costos CSV</button></div>
+<h3>Resultados financieros</h3><div class="stats">
+<div class="stat"><span>Costo de ingredientes por lote</span><b id="costoIngredientes">$0.00</b></div>
+<div class="stat"><span>Otros costos por lote</span><b id="otrosCostosOut">$0.00</b></div>
+<div class="stat"><span>Costo total de producción</span><b id="costoTotal">$0.00</b></div>
+<div class="stat"><span>Costo unitario</span><b id="costoUnitario">$0.00</b></div>
+<div class="stat"><span>Precio de venta por unidad</span><b id="precioVenta">$0.00</b></div>
+<div class="stat"><span>Utilidad unitaria</span><b id="utilidadUnitaria">$0.00</b></div>
+<div class="stat"><span>Ingresos totales</span><b id="ingresos">$0.00</b></div>
+<div class="stat"><span>Egresos totales</span><b id="egresos">$0.00</b></div>
+<div class="stat"><span>Utilidad total</span><b id="utilidadTotal">$0.00</b></div>
+<div class="stat"><span>Punto de equilibrio (unidades)</span><b id="peUnidades">—</b></div>
+<div class="stat"><span>Punto de equilibrio (ventas)</span><b id="peVentas">—</b></div>
+<div class="stat"><span>Margen sobre costo</span><b id="margenReal">—</b></div>
+</div><div class="interpret" id="costosInterpret">Capture los ingredientes, las unidades obtenidas y calcule los costos.</div>
+<div class="notice">Para el punto de equilibrio se separan los costos fijos de los costos variables. El simulador aproxima como variables los ingredientes, empaque y gas/energía, y usa el campo de costos fijos indicado. Evita registrar el mismo costo en dos campos.</div>
+</div>
+</section>
+<section id="balance" class="pane">
+<div class="card"><h2>Balance de materia por etapas</h2><p class="muted">Registre la cantidad que entra y la cantidad útil que sale de cada etapa. La diferencia se interpreta como residuos, mermas, evaporación u otras salidas no contabilizadas. Seleccione kg, g, L o ml y use la misma unidad en todo el proceso.</p>
+<div class="grid"><div class="field"><label>Producto / proceso</label><input id="productoBalance" value="Proceso de elaboración de alimentos"></div><div class="field"><label>Unidad global</label><select id="unidadBalance"><option>kg</option><option>g</option><option>L</option><option>ml</option></select></div><div class="field"><label>Etapas a utilizar</label><select id="numEtapas"><option>15</option><option>10</option><option>12</option><option>8</option></select></div><div class="field"><label>Entrada inicial</label><input id="entradaInicial" type="number" min="0" step="any" value="10"></div></div>
+<div class="tablewrap"><table><thead><tr><th>Etapa</th><th>Nombre de etapa</th><th>Cantidad que entra</th><th>Cantidad útil que sale</th><th>Residuos / diferencia</th><th>Rendimiento etapa (%)</th><th>Observación</th></tr></thead><tbody id="etapas"></tbody></table></div>
+<div class="actions noprint"><button class="primary" id="calcBalance">Calcular balance y diagrama</button><button class="secondary" id="demoBalance">Cargar ejemplo de 15 etapas</button><button class="secondary" id="clearBalance">Limpiar etapas</button><button class="secondary" id="exportBalance">Exportar balance CSV</button></div>
+<div class="stats"><div class="stat"><span>Entrada total inicial</span><b id="balEntrada">—</b></div><div class="stat"><span>Producto final útil</span><b id="balFinal">—</b></div><div class="stat"><span>Residuo acumulado estimado</span><b id="balResiduo">—</b></div><div class="stat"><span>Rendimiento global</span><b id="balRend">—</b></div></div>
+<h3>Diagrama de flujo de cantidades</h3><div id="diagrama" class="flow"></div>
+<div class="notice">El balance de cada etapa asume que las salidas no útiles equivalen a entrada menos salida útil. Si se incorporan ingredientes, agua, vapor, aceite, salmuera o materiales entre etapas, registra la cantidad de entrada real de esa etapa; no copies automáticamente la salida anterior sin considerar adiciones o separaciones.</div>
+</div>
+</section>
+<section id="interpretacion" class="pane">
+<div class="card"><h2>Interpretación amplia de resultados</h2>
+<h3>Etiqueta nutrimental y formulación</h3><div class="interpret"><b>Energía.</b> Es la energía alimentaria estimada a partir de la composición introducida. Si se captura el valor energético por ingrediente, se suma directamente la contribución de cada uno. Los resultados dependen de la calidad de las fichas técnicas o análisis usados; la cocción, evaporación, drenado y cambios de humedad pueden modificar la composición por 100 g del producto final.</div>
+<div class="interpret"><b>Proteínas.</b> La cantidad total se estima sumando el aporte de cada ingrediente. Un valor bajo o alto no determina por sí solo la calidad proteica, digestibilidad ni el cumplimiento de una declaración nutricional.</div>
+<div class="interpret"><b>Grasas totales, saturadas y trans.</b> Ayudan a caracterizar el perfil lipídico. Verifica que las grasas saturadas y trans de cada ingrediente sean coherentes con la grasa total y que la base de composición sea la misma.</div>
+<div class="interpret"><b>Carbohidratos y azúcares.</b> El resultado suma las cantidades declaradas por ingrediente. Distingue los azúcares totales de los añadidos: no todo azúcar presente en una fruta o leche se considera azúcar añadido. La identificación correcta requiere revisar ingredientes, proceso y definiciones normativas.</div>
+<div class="interpret"><b>Fibra y sodio.</b> La fibra depende del ingrediente y del procesamiento. El sodio puede provenir de sal, aditivos, ingredientes compuestos o materias primas. Si la fórmula usa sal común, captura el sodio correspondiente en la composición del ingrediente o añade un ingrediente “sal” con su composición conocida.</div>
+<div class="interpret"><b>Sellos y leyendas.</b> Los sellos visuales son una estimación educativa simplificada y no un dictamen legal. La decisión comercial requiere revisar la versión vigente de NOM-051, el perfil del producto, las fases aplicables, las excepciones, los criterios de cálculo y la presentación final.</div>
+<h3>Promedio, desviación estándar y coeficiente de variación</h3><div class="interpret"><b>Promedio.</b> Representa el centro de las mediciones capturadas. Si está por encima o debajo del objetivo, el proceso puede estar descentrado. Un promedio adecuado no garantiza que todas las unidades cumplan especificaciones.</div>
+<div class="interpret"><b>Desviación estándar.</b> Expresa la dispersión de las mediciones en las unidades originales. Una desviación alta indica resultados más separados entre sí; conviene investigar dosificación, homogeneidad, temperatura, tiempos, calibración, operador y variación de la materia prima.</div>
+<div class="interpret"><b>Coeficiente de variación.</b> Expresa la variación relativa en porcentaje respecto a la magnitud de la media. Facilita comparar variabilidad relativa entre series comparables, pero no tiene un umbral universal de aceptación para todos los alimentos. Si la media es cero, no se define de forma útil.</div>
+<div class="interpret"><b>Puntos fuera de límites.</b> Un punto fuera de los límites de control es una señal de posible causa especial y debe investigarse. No prueba por sí solo qué ocurrió. Revisa registros de lote, cambios de proveedor, ajustes de equipo, errores de muestreo y condiciones de medición. Diez datos son útiles para practicar, pero normalmente son insuficientes para establecer límites estables y validar un proceso.</div>
+<div class="interpret"><b>Límites de control y especificación.</b> Los límites de control describen el comportamiento estadístico observado; LIE y LSE son requisitos del producto. Una medición puede estar dentro de control y aun así incumplir especificaciones, o estar dentro de especificación aunque el patrón estadístico sugiera una causa especial.</div>
+<h3>Costos, utilidad y punto de equilibrio</h3><div class="interpret"><b>Costo total de producción.</b> Incluye el costo de ingredientes calculado con cantidades y precios unitarios, más los costos adicionales capturados. Revisa que todos los costos estén expresados para el mismo lote y periodo.</div>
+<div class="interpret"><b>Costo unitario.</b> Es el costo total dividido entre las unidades terminadas. Si hay mermas, reprocesos o unidades rechazadas, el costo por unidad vendible aumenta.</div>
+<div class="interpret"><b>Precio de venta y utilidad.</b> El precio calculado como costo unitario por (1 + porcentaje de ganancia) aplica un margen sobre costo, no un margen sobre ventas. La utilidad unitaria es el precio menos el costo unitario.</div>
+<div class="interpret"><b>Punto de equilibrio.</b> Estima cuántas unidades se necesitan vender para cubrir costos fijos con la contribución por unidad (precio menos costo variable unitario). Si la contribución es cero o negativa, no hay un punto de equilibrio finito con esos supuestos. El cálculo es tan confiable como la separación entre costos fijos y variables.</div>
+<h3>Balance de materia y rendimiento</h3><div class="interpret"><b>Entrada, salida y residuo.</b> Para cada etapa se compara la cantidad real de entrada con la cantidad útil que sale. La diferencia estimada puede corresponder a cáscaras, semillas, recortes, derrames, evaporación o material retenido. Si el valor de salida supera la entrada, puede haber una adición de materia o un error de registro.</div>
+<div class="interpret"><b>Rendimiento por etapa.</b> Mide la proporción de entrada que se conserva como salida útil. Un rendimiento bajo no significa automáticamente una operación deficiente: depende de la finalidad de la etapa, por ejemplo pelado, despulpado, filtrado o concentración.</div>
+<div class="interpret"><b>Rendimiento global.</b> Compara el producto final con la entrada inicial. Para un balance correcto, registra adiciones de agua, azúcar, aceite u otros ingredientes en las entradas de etapa correspondientes y conserva la misma unidad en todas las operaciones.</div>
+<div class="notice">Herramienta educativa: verifica los datos de formulación, las fichas técnicas y los requisitos regulatorios antes de usar los resultados para producción comercial o declaraciones oficiales.</div>
+</div>
+</section>
+<section id="gasTab" class="pane">
+<div class="card"><h2>Simulador de consumo de gas LP</h2>
+<p class="muted">Calcula energía térmica y consumo estimado de gas LP para calentamiento, cocción, escaldado, pasteurización, concentración, secado y otros procesos. Este módulo conserva su panel y cálculos propios dentro de esta pestaña.</p>
+<div class="notice">Al terminar el cálculo en el simulador, copia el “Costo estimado del lote” al campo “Gas LP / energía” de la pestaña Costos de producción para integrarlo al costo del producto terminado.</div>
+<iframe title="Simulador de consumo de gas LP" style="width:100%;height:1450px;border:1px solid var(--line);border-radius:10px;background:#fff" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;es&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;title&gt;Simulador general de energía y consumo de gas LP para alimentos&lt;/title&gt;
+&lt;style&gt;
+:root{--bg:#0a1220;--panel:#121f32;--panel2:#192940;--line:#2c405b;--text:#edf4ff;--muted:#a9bad0;--green:#55d6ae;--blue:#83b4ff;--amber:#ffd27e}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top left,#152744 0,#0a1220 60%);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header,main,footer{max-width:1320px;margin:auto}header{padding:28px 20px 18px}h1{font-size:clamp(1.5rem,3vw,2.35rem);line-height:1.15;margin:0 0 10px}header p{max-width:980px;color:var(--muted);margin:0}
+main{padding:0 20px 30px}.grid{display:grid;grid-template-columns:minmax(300px,1.08fr) minmax(300px,.92fr);gap:18px}.panel{background:rgba(18,31,50,.97);border:1px solid var(--line);border-radius:18px;padding:19px;box-shadow:0 15px 40px #0002}.panel h2{font-size:1.12rem;margin:0 0 15px}.section{color:var(--green);font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:.76rem;margin:21px 0 10px}.section:first-of-type{margin-top:0}.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:5px}.wide{grid-column:1/-1}label{font-size:.86rem;color:#dce8f7}input,select{width:100%;min-width:0;background:#0b1628;color:var(--text);border:1px solid #354b69;border-radius:10px;padding:10px;font:inherit}input:focus,select:focus{outline:2px solid #55d6ae55;border-color:var(--green)}.hint{color:var(--muted);font-size:.77rem}.buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}button{cursor:pointer;border:0;border-radius:10px;padding:11px 15px;font-weight:750;font-size:.9rem}.primary{background:var(--green);color:#05251c}.secondary{background:#2b405d;color:var(--text)}button:hover{filter:brightness(1.08)}.hero{background:linear-gradient(130deg,#103c39,#173552);border:1px solid #28665e;border-radius:14px;padding:17px;margin-bottom:12px}.eyebrow{font-size:.83rem;color:#b9e5d9}.big{font-size:clamp(2rem,4vw,3rem);font-weight:850;letter-spacing:-.04em;line-height:1.25;margin:5px 0}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}.metric .label{font-size:.78rem;color:var(--muted)}.metric .value{font-size:1.13rem;font-weight:780;overflow-wrap:anywhere;margin-top:4px}.formula,.status{background:#0b1628;border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:13px}.formula code{font-family:ui-monospace,Consolas,monospace;color:#aaf0d9;white-space:normal}.status{font-size:.84rem;color:var(--muted)}.status.warn{color:#ffe0a0;border-color:#745d31;background:#30291d}.status.ok{color:#b9f4e2;border-color:#28665e;background:#10322e}.tablewrap{overflow-x:auto;margin-top:13px}table{width:100%;border-collapse:collapse;font-size:.84rem}td,th{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:650}.notice{font-size:.82rem;color:var(--muted);margin:16px 0 0}.hidden{display:none}footer{text-align:center;color:var(--muted);font-size:.78rem;padding:18px}
+@media(max-width:850px){.grid{grid-template-columns:1fr}}@media(max-width:460px){header{padding:22px 13px 15px}main{padding:0 12px 24px}.panel{padding:14px}.fields{grid-template-columns:1fr}.wide{grid-column:auto}.metrics{grid-template-columns:1fr 1fr}}
+@media print{body{background:white;color:#111}.panel,.hero,.metric,.formula,.status{background:white;color:#111;box-shadow:none;border:1px solid #aaa}header p,.hint,.notice,.eyebrow,.metric .label,th{color:#444}button{display:none}.grid{grid-template-columns:1fr 1fr}}
+
+/* Ajustes solicitados: fondo blanco y ocultar los apartados 2, 3 y 4 sin romper cálculos */
+:root{--bg:#ffffff;--panel:#ffffff;--panel2:#f5f7fa;--line:#d5dbe3;--text:#172033;--muted:#596579;--green:#087f5b;--blue:#155eef;--amber:#8a4b00}
+html,body{background:#ffffff!important;color:#172033!important}
+body,header,main,footer,.grid,.panel,.hero,.metric,.metrics,.formula,.status,.tablewrap,table,thead,tbody,tr,td,th,.section,.field,.fields{background:#ffffff!important;color:#172033!important}
+input,select,button{background:#ffffff!important;color:#172033!important;border-color:#cbd5e1!important}
+label,.hint,.notice,.eyebrow,.metric .label,th{color:#334155!important}
+.panel{box-shadow:none!important;border:1px solid #d1d5db!important}
+.metric,.hero,.formula,.status{border:1px solid #d1d5db!important;box-shadow:none!important}
+.section{color:#047857!important}
+
+
+*{color-scheme:light}
+body{background:#fff!important}
+.panel,.hero,.metric,.formula,.status,.tablewrap{background:#fff!important}
+input,select{background:#fff!important;color:#172033!important}
+button{background:#f8fafc!important;color:#172033!important}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;header&gt;
+&lt;h1&gt;Simulador general de energía y consumo de gas LP para alimentos&lt;/h1&gt;
+&lt;p&gt;Estima la energía para calentar, cocinar, escaldar, pasteurizar, hervir, secar o procesar frutas, hortalizas, cereales y derivados. Calcula el calor sensible del producto alimenticio y convierte la energía requerida a litros de gas LP considerando la eficiencia del quemador y la duración del proceso.&lt;/p&gt;
+&lt;/header&gt;
+&lt;main&gt;
+&lt;div class=&quot;grid&quot;&gt;
+&lt;section class=&quot;panel&quot;&gt;
+&lt;h2&gt;Panel de control · Variables de proceso&lt;/h2&gt;
+&lt;div class=&quot;section&quot;&gt;1. Producto alimenticio&lt;/div&gt;
+&lt;div class=&quot;fields&quot;&gt;
+&lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;family&quot;&gt;Familia de alimento&lt;/label&gt;&lt;select id=&quot;family&quot;&gt;&lt;option&gt;Frutas&lt;/option&gt;&lt;option&gt;Hortalizas&lt;/option&gt;&lt;option&gt;Cereales y granos&lt;/option&gt;&lt;option&gt;Harinas y derivados&lt;/option&gt;&lt;option&gt;Oleaginosas y semillas&lt;/option&gt;&lt;option&gt;Leguminosas&lt;/option&gt;&lt;option&gt;Jugos, néctares y pulpas&lt;/option&gt;&lt;option&gt;Mermeladas, jarabes y conservas&lt;/option&gt;&lt;option&gt;Aceites y grasas&lt;/option&gt;&lt;option&gt;Lácteos y derivados&lt;/option&gt;&lt;option&gt;Carnes, pescados y huevos&lt;/option&gt;&lt;option&gt;Alimentos preparados&lt;/option&gt;&lt;option&gt;Otro alimento&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;
+&lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;product&quot;&gt;Nombre del alimento&lt;/label&gt;&lt;input id=&quot;product&quot; value=&quot;Pulpa de fruta&quot; placeholder=&quot;Ej. manzana, maíz, puré&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;mass&quot;&gt;Masa del alimento (kg)&lt;/label&gt;&lt;input id=&quot;mass&quot; type=&quot;number&quot; min=&quot;0&quot; step=&quot;any&quot; value=&quot;100&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;cp&quot;&gt;Calor específico Cp (kcal/kg·°C)&lt;/label&gt;&lt;input id=&quot;cp&quot; type=&quot;number&quot; min=&quot;0.001&quot; step=&quot;any&quot; value=&quot;0.90&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;t1&quot;&gt;Temperatura inicial T₁ (°C)&lt;/label&gt;&lt;input id=&quot;t1&quot; type=&quot;number&quot; step=&quot;any&quot; value=&quot;25&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;t2&quot;&gt;Temperatura final T₂ (°C)&lt;/label&gt;&lt;input id=&quot;t2&quot; type=&quot;number&quot; step=&quot;any&quot; value=&quot;90&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;field wide&quot;&gt;&lt;span class=&quot;hint&quot;&gt;El Cp depende de la composición y humedad. Introduce un valor de bibliografía, ficha técnica o medición para el producto específico. Valores orientativos no sustituyen datos reales.&lt;/span&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot;&gt;2. Gas LP y quemador&lt;/div&gt;
+&lt;div class=&quot;fields&quot;&gt;
+&lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;pc&quot;&gt;Poder calorífico gas LP (kcal/L)&lt;/label&gt;&lt;input id=&quot;pc&quot; type=&quot;number&quot; min=&quot;1&quot; step=&quot;any&quot; value=&quot;6000&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;eff&quot;&gt;Eficiencia térmica total (%)&lt;/label&gt;&lt;input id=&quot;eff&quot; type=&quot;number&quot; min=&quot;1&quot; max=&quot;100&quot; step=&quot;any&quot; value=&quot;70&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;price&quot;&gt;Precio del gas (MXN/L, opcional)&lt;/label&gt;&lt;input id=&quot;price&quot; type=&quot;number&quot; min=&quot;0&quot; step=&quot;any&quot; value=&quot;0&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;duty&quot;&gt;Factor de uso del quemador (%)&lt;/label&gt;&lt;input id=&quot;duty&quot; type=&quot;number&quot; min=&quot;1&quot; max=&quot;100&quot; step=&quot;any&quot; value=&quot;100&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;field wide&quot;&gt;&lt;span class=&quot;hint&quot;&gt;El factor de uso estima qué fracción del tiempo está encendido el quemador; no cambia la energía total ni los litros requeridos, sino el tiempo estimado de encendido.&lt;/span&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot;&gt;3. Operación específica (informativa)&lt;/div&gt;
+&lt;div class=&quot;fields&quot;&gt;
+&lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;method&quot;&gt;Tipo de proceso&lt;/label&gt;&lt;select id=&quot;method&quot;&gt;&lt;option&gt;Calentamiento&lt;/option&gt;&lt;option&gt;Escaldado&lt;/option&gt;&lt;option&gt;Cocción&lt;/option&gt;&lt;option&gt;Pasteurización&lt;/option&gt;&lt;option&gt;Hervido&lt;/option&gt;&lt;option&gt;Concentración / evaporación&lt;/option&gt;&lt;option&gt;Deshidratación&lt;/option&gt;&lt;option&gt;Fritura&lt;/option&gt;&lt;option&gt;Horneado&lt;/option&gt;&lt;option&gt;Tostado&lt;/option&gt;&lt;option&gt;Otro&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;
+&lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;batch&quot;&gt;Tamaño de lote (kg, informativo)&lt;/label&gt;&lt;input id=&quot;batch&quot; type=&quot;number&quot; min=&quot;0&quot; step=&quot;any&quot; value=&quot;100&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;time&quot;&gt;Tiempo de proceso (h)&lt;/label&gt;&lt;input id=&quot;time&quot; type=&quot;number&quot; min=&quot;0.01&quot; step=&quot;any&quot; value=&quot;2&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;buttons&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;primary&quot; id=&quot;calc&quot;&gt;Calcular consumo&lt;/button&gt;&lt;button type=&quot;button&quot; class=&quot;secondary&quot; id=&quot;reset&quot;&gt;Restablecer ejemplo&lt;/button&gt;&lt;button type=&quot;button&quot; class=&quot;secondary&quot; id=&quot;print&quot;&gt;Imprimir / guardar PDF&lt;/button&gt;&lt;/div&gt;
+&lt;div id=&quot;error&quot; class=&quot;status warn hidden&quot; role=&quot;alert&quot;&gt;&lt;/div&gt;
+&lt;/section&gt;
+&lt;section class=&quot;panel&quot; aria-live=&quot;polite&quot;&gt;
+&lt;h2&gt;Resultados del proceso&lt;/h2&gt;
+&lt;div class=&quot;hero&quot;&gt;&lt;div class=&quot;eyebrow&quot;&gt;Consumo total estimado de gas LP&lt;/div&gt;&lt;div class=&quot;big&quot; id=&quot;liters&quot;&gt;— L&lt;/div&gt;&lt;div id=&quot;period&quot; class=&quot;eyebrow&quot;&gt;Para el tiempo indicado&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;metrics&quot;&gt;
+&lt;div class=&quot;metric&quot;&gt;&lt;div class=&quot;label&quot;&gt;Consumo promedio&lt;/div&gt;&lt;div class=&quot;value&quot; id=&quot;hourly&quot;&gt;— L/h&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;metric&quot;&gt;&lt;div class=&quot;label&quot;&gt;Energía útil total&lt;/div&gt;&lt;div class=&quot;value&quot; id=&quot;useful&quot;&gt;— kcal&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;metric&quot;&gt;&lt;div class=&quot;label&quot;&gt;Energía requerida al combustible&lt;/div&gt;&lt;div class=&quot;value&quot; id=&quot;fuel&quot;&gt;— kcal&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;metric&quot;&gt;&lt;div class=&quot;label&quot;&gt;Tiempo de quemador encendido*&lt;/div&gt;&lt;div class=&quot;value&quot; id=&quot;burntime&quot;&gt;— h&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;metric&quot;&gt;&lt;div class=&quot;label&quot;&gt;Costo estimado del lote&lt;/div&gt;&lt;div class=&quot;value&quot; id=&quot;cost&quot;&gt;No indicado&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;metric&quot;&gt;&lt;div class=&quot;label&quot;&gt;Energía útil promedio&lt;/div&gt;&lt;div class=&quot;value&quot; id=&quot;power&quot;&gt;— kcal/h&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;metric&quot;&gt;&lt;div class=&quot;label&quot;&gt;Consumo por kg de producto&lt;/div&gt;&lt;div class=&quot;value&quot; id=&quot;perkg&quot;&gt;— L/kg&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;metric&quot;&gt;&lt;div class=&quot;label&quot;&gt;Costo por kg de producto&lt;/div&gt;&lt;div class=&quot;value&quot; id=&quot;costkg&quot;&gt;—&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;formula&quot;&gt;&lt;strong&gt;Modelo de cálculo&lt;/strong&gt;&lt;br&gt;&lt;br&gt;
+&lt;code&gt;Q producto = masa del producto × Cp × (T₂ − T₁)&lt;/code&gt;&lt;br&gt;
+&lt;code&gt;Energía requerida al combustible = Q producto ÷ eficiencia del quemador&lt;/code&gt;&lt;br&gt;
+&lt;code&gt;Gas LP (L) = energía requerida al combustible ÷ poder calorífico&lt;/code&gt;&lt;/div&gt;
+&lt;div id=&quot;status&quot; class=&quot;status&quot;&gt;Los resultados aparecerán aquí.&lt;/div&gt;
+&lt;h2 style=&quot;margin-top:20px&quot;&gt;Desglose energético&lt;/h2&gt;
+&lt;div class=&quot;tablewrap&quot;&gt;&lt;table&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;th&gt;Componente&lt;/th&gt;&lt;th&gt;Energía&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Calentamiento del producto alimenticio&lt;/td&gt;&lt;td id=&quot;qfood&quot;&gt;—&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Calor útil total del producto&lt;/td&gt;&lt;td id=&quot;qcorrected&quot;&gt;—&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Energía que debe aportar el gas LP&lt;/td&gt;&lt;td id=&quot;qfuel&quot;&gt;—&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
+&lt;h2 style=&quot;margin-top:20px&quot;&gt;Resumen de variables&lt;/h2&gt;
+&lt;div class=&quot;tablewrap&quot;&gt;&lt;table&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;th&gt;Variable&lt;/th&gt;&lt;th&gt;Valor&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Familia / alimento&lt;/td&gt;&lt;td id=&quot;foodout&quot;&gt;—&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Proceso&lt;/td&gt;&lt;td id=&quot;methodout&quot;&gt;—&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Temperaturas del producto&lt;/td&gt;&lt;td id=&quot;tout&quot;&gt;—&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Tiempo del proceso&lt;/td&gt;&lt;td id=&quot;timeout&quot;&gt;—&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Eficiencia del quemador&lt;/td&gt;&lt;td id=&quot;effout&quot;&gt;—&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Poder calorífico&lt;/td&gt;&lt;td id=&quot;pcout&quot;&gt;—&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
+&lt;p class=&quot;notice&quot;&gt;*Tiempo de encendido estimado = tiempo de proceso ÷ fracción de uso. El consumo calculado es teórico; el resultado real depende de la composición del alimento, Cp, control de temperatura, aislamiento, eficiencia del quemador y condiciones del gas.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/div&gt;
+&lt;p class=&quot;notice&quot;&gt;Importante: el modelo estima la energía para calentar el producto alimenticio y el consumo de gas LP. El agua de proceso, la masa del equipo, la evaporación y las pérdidas adicionales no forman parte de este modelo simplificado.&lt;/p&gt;
+&lt;/main&gt;
+&lt;footer&gt;Simulador educativo · HTML independiente · Cálculos en tu navegador, sin conexión a internet&lt;/footer&gt;
+&lt;script&gt;
+(function(){
+const ids=[&#x27;family&#x27;,&#x27;product&#x27;,&#x27;mass&#x27;,&#x27;cp&#x27;,&#x27;t1&#x27;,&#x27;t2&#x27;,&#x27;time&#x27;,&#x27;pc&#x27;,&#x27;eff&#x27;,&#x27;price&#x27;,&#x27;duty&#x27;,&#x27;method&#x27;,&#x27;batch&#x27;];
+const $=id=&gt;document.getElementById(id), n=id=&gt;Number($(id).value);
+const f=(x,d=2)=&gt;Number(x).toLocaleString(&#x27;es-MX&#x27;,{minimumFractionDigits:d,maximumFractionDigits:d}), f0=x=&gt;Number(x).toLocaleString(&#x27;es-MX&#x27;,{maximumFractionDigits:2});
+function calc(){
+ const m=n(&#x27;mass&#x27;),cp=n(&#x27;cp&#x27;),t1=n(&#x27;t1&#x27;),t2=n(&#x27;t2&#x27;),time=n(&#x27;time&#x27;),pc=n(&#x27;pc&#x27;),eff=n(&#x27;eff&#x27;)/100,price=n(&#x27;price&#x27;),duty=n(&#x27;duty&#x27;)/100;
+ let errors=[];
+ if(!(m&gt;0))errors.push(&#x27;La masa del alimento debe ser mayor que cero.&#x27;);
+ if(!(cp&gt;0))errors.push(&#x27;El Cp del alimento debe ser mayor que cero.&#x27;);
+ if(!(t2&gt;=t1))errors.push(&#x27;La temperatura final del alimento debe ser igual o mayor que la inicial.&#x27;);
+ if(!(time&gt;0))errors.push(&#x27;El tiempo debe ser mayor que cero.&#x27;);
+ if(!(pc&gt;0))errors.push(&#x27;El poder calorífico debe ser mayor que cero.&#x27;);
+ if(!(eff&gt;0&amp;&amp;eff&lt;=1))errors.push(&#x27;La eficiencia debe estar entre 1 y 100 %.&#x27;);
+ if(!(duty&gt;0&amp;&amp;duty&lt;=1))errors.push(&#x27;El factor de uso debe estar entre 1 y 100 %.&#x27;);
+ if(price&lt;0)errors.push(&#x27;El precio no puede ser negativo.&#x27;);
+ $(&#x27;error&#x27;).classList.toggle(&#x27;hidden&#x27;,!errors.length);
+ if(errors.length){$(&#x27;error&#x27;).textContent=errors.join(&#x27; &#x27;);return;}
+ const qf=m*cp*(t2-t1), corrected=qf, qfuel=corrected/eff, liters=qfuel/pc, hourly=liters/time, cost=price&gt;0?liters*price:null;
+ $(&#x27;liters&#x27;).textContent=f(liters,2)+&#x27; L&#x27;;$(&#x27;period&#x27;).textContent=&#x27;Para &#x27;+f(time,2)+&#x27; h de proceso&#x27;;
+ $(&#x27;hourly&#x27;).textContent=f(hourly,3)+&#x27; L/h&#x27;;$(&#x27;useful&#x27;).textContent=f0(corrected)+&#x27; kcal&#x27;;$(&#x27;fuel&#x27;).textContent=f0(qfuel)+&#x27; kcal&#x27;;$(&#x27;burntime&#x27;).textContent=f(time/duty,2)+&#x27; h&#x27;;
+ $(&#x27;cost&#x27;).textContent=cost===null?&#x27;No indicado&#x27;:&#x27;$&#x27;+f(cost,2)+&#x27; MXN&#x27;;$(&#x27;power&#x27;).textContent=f(corrected/time,1)+&#x27; kcal/h&#x27;;$(&#x27;perkg&#x27;).textContent=f(liters/m,4)+&#x27; L/kg&#x27;;
+ $(&#x27;costkg&#x27;).textContent=cost===null?&#x27;No indicado&#x27;:&#x27;$&#x27;+f(cost/m,3)+&#x27; MXN/kg&#x27;;
+ [[&#x27;qfood&#x27;,qf],[&#x27;qcorrected&#x27;,corrected],[&#x27;qfuel&#x27;,qfuel]].forEach(([id,v])=&gt;$(id).textContent=f0(v)+&#x27; kcal&#x27;);
+ $(&#x27;foodout&#x27;).textContent=$(&#x27;family&#x27;).value+&#x27; · &#x27;+$(&#x27;product&#x27;).value;
+ $(&#x27;methodout&#x27;).textContent=$(&#x27;method&#x27;).value+&#x27; · lote informativo: &#x27;+f0(n(&#x27;batch&#x27;))+&#x27; kg&#x27;;
+ $(&#x27;tout&#x27;).textContent=f(t1,1)+&#x27; → &#x27;+f(t2,1)+&#x27; °C&#x27;;$(&#x27;timeout&#x27;).textContent=f(time,2)+&#x27; h&#x27;;$(&#x27;effout&#x27;).textContent=f(eff*100,1)+&#x27; %&#x27;;$(&#x27;pcout&#x27;).textContent=f0(pc)+&#x27; kcal/L&#x27;;
+ $(&#x27;status&#x27;).className=&#x27;status ok&#x27;;$(&#x27;status&#x27;).textContent=&#x27;Cálculo actualizado. Se considera únicamente el calentamiento del producto alimenticio; no incluye agua de proceso, masa del equipo, evaporación ni pérdidas adicionales.&#x27;;
+}
+$(&#x27;calc&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;{try{calc();}catch(e){$(&#x27;error&#x27;).classList.remove(&#x27;hidden&#x27;);$(&#x27;error&#x27;).textContent=&#x27;No se pudo calcular: &#x27;+e.message;}});
+ids.forEach(id=&gt;$(id).addEventListener(&#x27;input&#x27;,()=&gt;{if(!$(&#x27;error&#x27;).classList.contains(&#x27;hidden&#x27;))calc();}));
+$(&#x27;reset&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;{try{const d={family:&#x27;Frutas&#x27;,product:&#x27;Pulpa de fruta&#x27;,mass:100,cp:0.90,t1:25,t2:90,time:2,pc:6000,eff:70,price:0,duty:100,method:&#x27;Calentamiento&#x27;,batch:100};Object.entries(d).forEach(([k,v])=&gt;$(k).value=v);calc();}catch(e){$(&#x27;error&#x27;).classList.remove(&#x27;hidden&#x27;);$(&#x27;error&#x27;).textContent=&#x27;No se pudo restablecer el ejemplo: &#x27;+e.message;}});
+$(&#x27;print&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;{try{calc();if(!$(&#x27;error&#x27;).classList.contains(&#x27;hidden&#x27;))return;window.focus();setTimeout(()=&gt;window.print(),50);}catch(e){$(&#x27;error&#x27;).classList.remove(&#x27;hidden&#x27;);$(&#x27;error&#x27;).textContent=&#x27;No se pudo abrir la impresión. Usa Ctrl+P para imprimir o guardar como PDF.&#x27;;}});calc();
+})();
+&lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;"></iframe>
+</div>
+</section>
+<div class="footer">AgroNutriControl Integral · HTML local · Los cálculos se realizan en el navegador. Exporta los registros CSV para conservarlos.</div>
+</main>
+<script>
+(()=> {
+const $=id=>document.getElementById(id), num=id=>{let x=parseFloat($(id)?.value);return Number.isFinite(x)?x:0}, fmt=(x,d=2)=>Number.isFinite(x)?x.toLocaleString('es-MX',{maximumFractionDigits:d,minimumFractionDigits:0}):'—', money=x=>'$'+fmt(x,2)+' MXN';
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.pane').forEach(x=>x.classList.toggle('active',x.id===b.dataset.pane));if(b.dataset.pane==='control')setTimeout(()=>{drawChart('chartI',lastValues,lastLimits,'Valores');drawChart('chartD',lastDeviations,lastDevLimits,'Desviación');},50)}));
+const nutrientKeys=['energia','proteina','grasa','saturada','trans','carbo','azucares','anadidos','fibra','sodio'];
+const nutrientLabels=['Energía kcal','Proteína g','Grasa g','Saturada g','Trans g','Carbohidratos g','Azúcares g','Azúcares añadidos g','Fibra g','Sodio mg'];
+let ingCount=0,lastNutrition={},ingredientCost=0,lastValues=[],lastLimits=null,lastDeviations=[],lastDevLimits=null;
+function addIngredient(data={}){ingCount++;let tr=document.createElement('tr');tr.id='ingrow'+ingCount;tr.innerHTML=`<td>${ingCount}</td><td><input class="ing-name" value="${data.name||''}" placeholder="Ingrediente"></td><td><input class="ing-qty" type="number" min="0" step="any" value="${data.qty??0}"></td><td><select class="ing-unit"><option ${data.unit!=='ml'?'selected':''}>g</option><option ${data.unit==='ml'?'selected':''}>ml</option></select></td><td><input class="ing-density" type="number" min=".001" step="any" value="${data.density??1}"></td><td><select class="ing-base"><option value="100g">por 100 g</option><option value="100ml" ${data.base==='100ml'?'selected':''}>por 100 ml</option></select></td>${nutrientKeys.map(k=>`<td><input class="nut-${k}" type="number" min="0" step="any" value="${data[k]??0}" title="${k} por base seleccionada"></td>`).join('')}<td><input class="ing-cost" type="number" min="0" step="any" value="${data.cost??0}"></td><td class="ing-subtotal">$0.00</td><td><button class="danger removeIng" type="button">×</button></td>`; // header includes action column
+$('ingredientes').appendChild(tr);tr.querySelector('.removeIng').addEventListener('click',()=>{tr.remove();renumberIngredients();calcNutri()});tr.querySelector('.ing-name').addEventListener('change',()=>applyFoodPreset(tr));tr.querySelector('.ing-name').addEventListener('blur',()=>applyFoodPreset(tr));tr.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>{calcNutri(false)}));return tr}
+function renumberIngredients(){[...$('ingredientes').rows].forEach((r,i)=>r.cells[0].textContent=i+1)}
+const foodDB={
+'agua':{energia:0,proteina:0,grasa:0,saturada:0,trans:0,carbo:0,azucares:0,anadidos:0,fibra:0,sodio:0},
+'azucar':{energia:400,carbo:100,azucares:100,anadidos:100},
+'azúcar':{energia:400,carbo:100,azucares:100,anadidos:100},
+'sal':{energia:0,sodio:39300},
+'harina de trigo':{energia:364,proteina:10.3,grasa:1,saturada:.16,trans:0,carbo:76.3,azucares:.3,fibra:2.7,sodio:2},
+'avena':{energia:389,proteina:16.9,grasa:6.9,saturada:1.2,carbo:66.3,azucares:0.99,fibra:10.6,sodio:2},
+'arroz blanco':{energia:365,proteina:7.1,grasa:.7,saturada:.2,carbo:80,azucares:.1,fibra:1.3,sodio:5},
+'aceite vegetal':{energia:884,grasa:100,saturada:14,trans:0},
+'aceite de oliva':{energia:884,grasa:100,saturada:14,trans:0},
+'mantequilla':{energia:717,proteina:.85,grasa:81.1,saturada:51.4,trans:3.3,carbo:.1,azucares:.1,sodio:11},
+'leche entera':{energia:61,proteina:3.15,grasa:3.25,saturada:1.9,carbo:4.8,azucares:5,sodio:43},
+'leche descremada':{energia:34,proteina:3.4,grasa:.1,saturada:.06,carbo:5,azucares:5,sodio:42},
+'huevo':{energia:143,proteina:12.6,grasa:9.5,saturada:3.1,carbo:.7,azucares:.4,sodio:142},
+'fresa':{energia:32,proteina:.7,grasa:.3,carbo:7.7,azucares:4.9,fibra:2,sodio:1},
+'manzana':{energia:52,proteina:.3,grasa:.2,carbo:13.8,azucares:10.4,fibra:2.4,sodio:1},
+'platano':{energia:89,proteina:1.1,grasa:.3,carbo:22.8,azucares:12.2,fibra:2.6,sodio:1},
+'plátano':{energia:89,proteina:1.1,grasa:.3,carbo:22.8,azucares:12.2,fibra:2.6,sodio:1},
+'miel':{energia:304,carbo:82.4,azucares:82.1,anadidos:82.1,sodio:4},
+'cacahuate':{energia:567,proteina:25.8,grasa:49.2,saturada:6.8,carbo:16.1,azucares:4.7,fibra:8.5,sodio:18},
+'cacahuates':{energia:567,proteina:25.8,grasa:49.2,saturada:6.8,carbo:16.1,azucares:4.7,fibra:8.5,sodio:18},
+'cacao en polvo':{energia:228,proteina:19.6,grasa:13.7,saturada:8.1,carbo:57.9,azucares:1.8,fibra:37,sodio:21},
+'jitomate':{energia:18,proteina:.9,grasa:.2,carbo:3.9,azucares:2.6,fibra:1.2,sodio:5},
+'tomate':{energia:18,proteina:.9,grasa:.2,carbo:3.9,azucares:2.6,fibra:1.2,sodio:5},
+'zanahoria':{energia:41,proteina:.9,grasa:.2,carbo:9.6,azucares:4.7,fibra:2.8,sodio:69},
+'papa':{energia:77,proteina:2,grasa:.1,carbo:17.5,azucares:.8,fibra:2.2,sodio:6},
+'limon':{energia:29,proteina:1.1,grasa:.3,carbo:9.3,azucares:2.5,fibra:2.8,sodio:2},
+'limón':{energia:29,proteina:1.1,grasa:.3,carbo:9.3,azucares:2.5,fibra:2.8,sodio:2}
+};
+function applyFoodPreset(tr){const name=tr.querySelector('.ing-name').value.trim().toLocaleLowerCase('es-MX');const key=Object.keys(foodDB).find(k=>k.toLocaleLowerCase('es-MX')===name);if(!key)return;const preset=foodDB[key];nutrientKeys.forEach(k=>{const el=tr.querySelector('.nut-'+k);el.value=preset[k]??0});tr.querySelector('.ing-base').value='100g';if(name==='agua')tr.querySelector('.ing-base').value='100ml';calcNutri(false)}
+function getIngredients(){return [...$('ingredientes').rows].map(tr=>{const val=cls=>parseFloat(tr.querySelector('.'+cls)?.value)||0;return {tr,name:tr.querySelector('.ing-name').value.trim()||'Ingrediente',qty:val('ing-qty'),unit:tr.querySelector('.ing-unit').value,density:Math.max(.001,val('ing-density')),base:tr.querySelector('.ing-base').value,cost:val('ing-cost'),nut:Object.fromEntries(nutrientKeys.map(k=>[k,val('nut-'+k)]))}})}
+function calcNutri(show=true){const ings=getIngredients();let totals=Object.fromEntries(nutrientKeys.map(k=>[k,0])),totalMassG=0,cost=0,totalQty=0;
+ings.forEach(i=>{const grams=i.unit==='ml'?i.qty*i.density:i.qty;const amountBase=i.base==='100ml'?(i.unit==='ml'?i.qty:i.qty/i.density):grams;const factor=amountBase/100;nutrientKeys.forEach(k=>totals[k]+=i.nut[k]*factor);totalMassG+=grams;totalQty+=i.qty;const costUnit=i.unit==='ml'?i.cost/1000:i.cost/1000;const qkg=i.unit==='ml'?i.qty/1000:i.qty/1000;const subtotal=qkg*i.cost;i.tr.querySelector('.ing-subtotal').textContent=money(subtotal);cost+=subtotal});
+ingredientCost=cost;lastNutrition=totals;const portion=num('porcion'),baseMass=totalMassG||0,portionGrams=$('unidadPorcion').value==='ml'?portion:portion;const scale=baseMass>0?portionGrams/baseMass:0;
+const portionN=Object.fromEntries(nutrientKeys.map(k=>[k,totals[k]*scale]));
+const ids={energia:'lblEnergia',proteina:'lblProteina',grasa:'lblGrasa',saturada:'lblSaturada',trans:'lblTrans',carbo:'lblCarbo',azucares:'lblAzucares',anadidos:'lblAnadidos',fibra:'lblFibra',sodio:'lblSodio'};
+Object.entries(ids).forEach(([k,id])=>$(id).textContent=fmt(portionN[k],2)+(k==='energia'?' kcal':k==='sodio'?' mg':' g'));
+$('lblProducto').innerHTML='<strong>'+($('marca').value.trim()?$('marca').value.trim()+' · ':'')+($('producto').value||'Producto alimenticio')+'</strong>';$('lblPorcion').textContent=`Tamaño de porción: ${fmt(portion)} ${$('unidadPorcion').value}`;$('lblPorciones').textContent='Porciones por envase: '+fmt(num('porciones'));
+const per100=Object.fromEntries(nutrientKeys.map(k=>[k,baseMass?totals[k]*100/baseMass:0]));const energy=per100.energia,sat=per100.saturada,trans=per100.trans,sugar=per100.azucares,sodium=per100.sodio;let seals=[];
+if($('conCalorias').value==='si'){if($('tipoProducto').value==='bebida'?energy>=70:energy>=275)seals.push('EXCESO CALORÍAS');if(energy>0&&sat*9/energy*100>=10)seals.push('EXCESO GRASAS SATURADAS');if(energy>0&&trans*9/energy*100>=1)seals.push('EXCESO GRASAS TRANS');if(energy>0&&sugar*4/energy*100>=10)seals.push('EXCESO AZÚCARES');if(sodium>=350||(energy>0&&sodium/energy>=1))seals.push('EXCESO SODIO')}
+$('sellos').innerHTML=seals.length?seals.map(s=>`<div class="seal">${s}</div>`).join(''):'<span class="pill">Sin sellos estimados por esta regla educativa</span>';
+let legends=[];if($('edulcorante').value==='si')legends.push('CONTIENE EDULCORANTES, NO RECOMENDABLE EN NIÑOS');if($('cafeina').value==='si')legends.push('CONTIENE CAFEÍNA, EVITAR EN NIÑOS');$('leyendas').textContent=legends.length?'Leyendas a revisar: '+legends.join(' · '):'No se seleccionaron leyendas precautorias.';
+$('nutriResumen').textContent=`Ingredientes capturados: ${ings.filter(i=>i.name!=='Ingrediente'||i.qty>0).length}. Masa total estimada de la fórmula: ${fmt(totalMassG/1000,3)} kg (según densidades). Energía total estimada: ${fmt(totals.energia)} kcal; por porción: ${fmt(portionN.energia)} kcal. Costo de ingredientes calculado: ${money(cost)}. La etiqueta se calcula sumando el aporte declarado de cada ingrediente y escalando al tamaño de porción; si hay cocción, evaporación, drenado o cambios de humedad, ajuste la composición al producto terminado.`;
+calcCostos();return {totals,per100,portionN,totalMassG,cost}}
+function loadExampleIngredients(){ $('ingredientes').innerHTML='';ingCount=0;[
+{name:'Harina de trigo',qty:500,unit:'g',density:1.0,energia:364,proteina:10.3,grasa:1,carbo:76.3,azucares:0.3,fibra:2.7,sodio:2,cost:22},
+{name:'Azúcar',qty:200,unit:'g',density:1,energia:400,carbo:100,azucares:100,anadidos:100,cost:32},
+{name:'Aceite vegetal',qty:100,unit:'g',density:.92,energia:884,grasa:100,saturada:14,trans:0,cost:48},
+{name:'Agua',qty:200,unit:'ml',density:1,base:'100ml',cost:0.5}
+].forEach(addIngredient);calcNutri()}
+$('addIng').addEventListener('click',()=>addIngredient());$('ejemploIng').addEventListener('click',loadExampleIngredients);$('calcNutri').addEventListener('click',()=>calcNutri(true));$('printLabel').addEventListener('click',()=>{calcNutri();window.print()});
+function csvDownload(name,rows){const content='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')).join('\r\n');const a=document.createElement('a'),url=URL.createObjectURL(new Blob([content],{type:'text/csv;charset=utf-8;'}));a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
+$('exportIng').addEventListener('click',()=>{let rows=[['Ingrediente','Cantidad','Unidad','Densidad g/ml','Base',...nutrientLabels,'Costo por kg/L','Subtotal MXN']];getIngredients().forEach(i=>rows.push([i.name,i.qty,i.unit,i.density,i.base,...nutrientKeys.map(k=>i.nut[k]),i.cost,i.qty/1000*i.cost]));csvDownload('formula_ingredientes.csv',rows)});
+// Control chart
+function buildSamples(){ $('muestras').innerHTML='';for(let i=1;i<=10;i++){let tr=document.createElement('tr');tr.innerHTML=`<td>${i}</td><td><input id="m${i}" type="number" step="any"></td><td><input id="obs${i}" placeholder="Opcional"></td>`;$('muestras').appendChild(tr)}}
+buildSamples();function sampleVals(){return Array.from({length:10},(_,i)=>parseFloat($('m'+(i+1)).value)).filter(Number.isFinite)}
+function alarmTone(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC){alert('Este navegador no permite audio.');return}const c=new AC();[0,1,2].forEach(i=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=i%2?660:880;g.gain.setValueAtTime(.0001,c.currentTime+i*.22);g.gain.exponentialRampToValueAtTime(.14,c.currentTime+i*.22+.02);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+i*.22+.16);o.connect(g);g.connect(c.destination);o.start(c.currentTime+i*.22);o.stop(c.currentTime+i*.22+.18)});setTimeout(()=>c.close(),1000)}catch(e){alert('No se pudo reproducir la alarma. Revisa los permisos de sonido del navegador.')}}$('alarmTest').addEventListener('click',alarmTone);
+function drawChart(id,vals,lim,title){const c=$(id),ctx=c.getContext('2d'),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);if(!vals||!vals.length){ctx.fillStyle='#667085';ctx.font='18px sans-serif';ctx.fillText('Capture las muestras y calcule',20,40);return}let all=vals.slice();if(lim)all.push(lim.mean,lim.ucl,lim.lcl);let mn=Math.min(...all),mx=Math.max(...all);if(mn===mx){mn-=1;mx+=1}let pad=(mx-mn)*.12;mn-=pad;mx+=pad;const L=62,R=18,T=25,B=38,X=i=>L+i*(w-L-R)/Math.max(1,vals.length-1),Y=v=>T+(mx-v)/(mx-mn)*(h-T-B);ctx.font='12px sans-serif';for(let j=0;j<=5;j++){let v=mn+(mx-mn)*j/5,y=Y(v);ctx.strokeStyle='#e1e7ef';ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(w-R,y);ctx.stroke();ctx.fillStyle='#536174';ctx.fillText(fmt(v,2),3,y+4)}if(lim){[['ucl','#b42318','LCS'],['mean','#155eef','Media'],['lcl','#b42318','LCI']].forEach(([k,col,l])=>{ctx.strokeStyle=col;ctx.setLineDash(k==='mean'?[4,4]:[7,4]);ctx.beginPath();ctx.moveTo(L,Y(lim[k]));ctx.lineTo(w-R,Y(lim[k]));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=col;ctx.fillText(l,w-R-34,Y(lim[k])-4)})}ctx.strokeStyle='#155eef';ctx.lineWidth=2.5;ctx.beginPath();vals.forEach((v,i)=>i?ctx.lineTo(X(i),Y(v)):ctx.moveTo(X(i),Y(v)));ctx.stroke();vals.forEach((v,i)=>{ctx.fillStyle=lim&&(v>lim.ucl||v<lim.lcl)?'#b42318':'#155eef';ctx.beginPath();ctx.arc(X(i),Y(v),4.5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#344054';ctx.fillText(String(i+1),X(i)-3,h-15)});ctx.fillStyle='#172033';ctx.font='bold 14px sans-serif';ctx.fillText(title,L,16)}
+function calcControl(){let vals=sampleVals();if(vals.length<2){alert('Capture al menos dos muestras numéricas.');return}let mean=vals.reduce((a,b)=>a+b,0)/vals.length,sd=Math.sqrt(vals.reduce((a,b)=>a+(b-mean)**2,0)/(vals.length-1)),cv=mean===0?NaN:sd/Math.abs(mean)*100,method=$('metodoControl').value,lcl=method==='sigma'?mean-3*sd:num('lie'),ucl=method==='sigma'?mean+3*sd:num('lse');lastValues=vals;lastLimits={mean,lcl,ucl};lastDeviations=vals.map(v=>Math.abs(v-mean));let dm=lastDeviations.reduce((a,b)=>a+b,0)/vals.length,ds=Math.sqrt(lastDeviations.reduce((a,b)=>a+(b-dm)**2,0)/(vals.length-1));lastDevLimits={mean:dm,lcl:Math.max(0,dm-3*ds),ucl:dm+3*ds};$('media').textContent=fmt(mean)+' '+$('unidadM').value;$('desv').textContent=fmt(sd)+' '+$('unidadM').value;$('cv').textContent=fmt(cv)+'%';$('rango').textContent=fmt(Math.max(...vals)-Math.min(...vals))+' '+$('unidadM').value;let out=vals.map((v,i)=>({v,i})).filter(x=>x.v<lcl||x.v>ucl),spec=vals.filter(v=>v<num('lie')||v>num('lse'));$('estadoControl').className='interpret '+(out.length?'bad':'good');$('estadoControl').textContent=`Se analizaron ${vals.length} muestras. ${out.length?`ALERTA: ${out.length} punto(s) fuera de límites de control en muestras ${out.map(x=>x.i+1).join(', ')}. Investigue causas especiales.`:'No hay puntos fuera de los límites de control calculados.'} ${spec.length?`${spec.length} valor(es) también fuera de las especificaciones LIE/LSE.`:''}`;if(out.length)alarmTone();$('interpretI').textContent=`La media es ${fmt(mean)}. LCI ${fmt(lcl)} y LCS ${fmt(ucl)}. ${out.length?'Los puntos señalados merecen investigación del proceso, instrumento, materia prima, operador y método.':'No se detectaron puntos fuera de estos límites en la muestra disponible; revise además tendencias y patrones.'}`;$('interpretD').textContent=`La desviación media absoluta es ${fmt(dm)} y el CV es ${fmt(cv)}%. ${cv<5?'Variación relativa baja como referencia descriptiva.':cv<10?'Variación relativa moderada como referencia descriptiva.':'Variación relativa elevada como referencia descriptiva.'} Estos rangos son orientativos, no límites universales de aceptación.`;drawChart('chartI',vals,lastLimits,'Valores individuales');drawChart('chartD',lastDeviations,lastDevLimits,'Desviación absoluta')}
+$('calcControl').addEventListener('click',calcControl);$('demoControl').addEventListener('click',()=>{[99.7,100.2,99.8,100.1,100.4,99.9,100,100.3,99.6,104.5].forEach((v,i)=>$('m'+(i+1)).value=v);calcControl()});$('clearControl').addEventListener('click',()=>{for(let i=1;i<=10;i++){$('m'+i).value='';$('obs'+i).value=''}lastValues=[];lastLimits=null;lastDeviations=[];lastDevLimits=null;['media','desv','cv','rango'].forEach(id=>$(id).textContent='—');$('estadoControl').textContent='Capture las muestras y calcule.';drawChart('chartI',[],null,'Valores');drawChart('chartD',[],null,'Desviación')});$('exportControl').addEventListener('click',()=>{let rows=[['Muestra',$('nombreVariable').value,'Unidad','Observación']];for(let i=1;i<=10;i++)rows.push([i,$('m'+i).value,$('unidadM').value,$('obs'+i).value]);csvDownload('control_estadistico.csv',rows)});
+$('variable').addEventListener('change',()=>{let m={peso:['Peso de llenado','g'],brix:['°Brix','°Brix'],ph:['pH','pH'],humedad:['Humedad','%'],temperatura:['Temperatura','°C'],viscosidad:['Viscosidad','mPa·s'],manual:['Variable manual','Otra']}[$('variable').value];$('nombreVariable').value=m[0];$('unidadM').value=m[1]});
+// Costing
+function initCostRows(){const body=$('costIngredientsRows');body.innerHTML='';for(let i=1;i<=15;i++){const tr=document.createElement('tr');tr.innerHTML=`<td>${i}</td><td><input class="cost-ing-name" placeholder="Ingrediente ${i}"></td><td><input class="cost-ing-qty" type="number" min="0" step="any" value="0"></td><td><select class="cost-ing-unit"><option>kg</option><option>g</option><option>L</option><option>ml</option><option>unidad</option></select></td><td><input class="cost-ing-unitcost" type="number" min="0" step="any" value="0"></td><td class="cost-ing-total">$0.00</td>`;body.appendChild(tr);tr.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',calcCostos));}calcCostos()}
+function calcCostos(){let ingredientTotal=0;const ingredientRows=[...$('costIngredientsRows').rows];ingredientRows.forEach(tr=>{const q=parseFloat(tr.querySelector('.cost-ing-qty').value)||0,unitCost=parseFloat(tr.querySelector('.cost-ing-unitcost').value)||0,total=q*unitCost;tr.querySelector('.cost-ing-total').textContent=money(total);ingredientTotal+=total});$('costIngredientsSum').textContent=money(ingredientTotal);
+const labor=num('manoObra'),pack=num('empaque'),energy=num('energiaCosto'),indirect=num('indirectos'),others=labor+pack+energy+indirect,total=ingredientTotal+others,units=num('unidades'),unit=units>0?total/units:0,profitPct=num('ganancia')/100,calcPrice=unit*(1+profitPct),price=num('precioManual')>0?num('precioManual'):calcPrice,unitProfit=price-unit,revenue=price*units,expenses=total,net=revenue-expenses;
+$('costoIngredientes').textContent=money(ingredientTotal);$('otrosCostosOut').textContent=money(others);$('costoTotal').textContent=money(total);$('costoUnitario').textContent=money(unit);$('precioVenta').textContent=money(price);$('utilidadUnitaria').textContent=money(unitProfit);$('ingresos').textContent=money(revenue);$('egresos').textContent=money(expenses);$('utilidadTotal').textContent=money(net);$('margenReal').textContent=unit>0?fmt(unitProfit/unit*100)+'%':'—';
+const fixed=num('costosFijos'),variableCosts=ingredientTotal+pack+energy,variableUnit=units>0?variableCosts/units:0,contribution=price-variableUnit,pe=contribution>0?Math.ceil(fixed/contribution):null;$('peUnidades').textContent=pe===null?'No calculable':fmt(pe,0);$('peVentas').textContent=pe===null?'No calculable':money(pe*price);$('costosInterpret').textContent=`Costo de ingredientes: ${money(ingredientTotal)}. Otros costos del lote: ${money(others)}. Costo total de producción: ${money(total)}. Unidades obtenidas: ${fmt(units,0)}; costo unitario: ${money(unit)}. Precio de venta usado: ${money(price)}; utilidad unitaria: ${money(unitProfit)}; ingresos: ${money(revenue)}; egresos: ${money(expenses)}; utilidad total: ${money(net)}. Punto de equilibrio calculado con costos fijos de ${money(fixed)} y costo variable aproximado por unidad de ${money(variableUnit)}. ${contribution<=0?'La contribución unitaria es cero o negativa; no existe un punto de equilibrio finito con estos datos.':fixed===0?'No se capturaron costos fijos, por lo que el punto de equilibrio calculado es cero unidades.':'El punto de equilibrio es una estimación y depende de clasificar correctamente los costos.'}`;
+return {ingredientTotal,others,total,units,unit,profitPct,price,unitProfit,revenue,expenses,net,fixed,variableUnit,pe,ingredientRows}}
+$('calcCostos').addEventListener('click',calcCostos);
+['manoObra','empaque','energiaCosto','indirectos','unidades','ganancia','precioManual','costosFijos'].forEach(id=>$(id).addEventListener('input',calcCostos));
+$('fillCostRows').addEventListener('click',()=>{initCostRows()});
+$('clearCostRows').addEventListener('click',()=>{[...$('costIngredientsRows').rows].forEach(tr=>{tr.querySelector('.cost-ing-name').value='';tr.querySelector('.cost-ing-qty').value=0;tr.querySelector('.cost-ing-unit').value='kg';tr.querySelector('.cost-ing-unitcost').value=0});calcCostos()});
+$('exportCostos').addEventListener('click',()=>{let c=calcCostos();let rows=[['Ingrediente','Cantidad','Unidad','Costo unitario MXN','Costo total MXN']];c.ingredientRows.forEach(tr=>rows.push([tr.querySelector('.cost-ing-name').value,tr.querySelector('.cost-ing-qty').value,tr.querySelector('.cost-ing-unit').value,tr.querySelector('.cost-ing-unitcost').value,tr.querySelector('.cost-ing-total').textContent]));rows.push(['Costo total ingredientes','','','',c.ingredientTotal],['Mano de obra','','','',num('manoObra')],['Empaque','','','',num('empaque')],['Gas LP / energía','','','',num('energiaCosto')],['Costos indirectos','','','',num('indirectos')],['Costo total producción','','','',c.total],['Unidades obtenidas','','','',c.units],['Costo unitario','','','',c.unit],['Ganancia sobre costo (%)','','','',c.profitPct*100],['Precio venta unitario','','','',c.price],['Utilidad unitaria','','','',c.unitProfit],['Ingresos totales','','','',c.revenue],['Egresos totales','','','',c.expenses],['Utilidad total','','','',c.net],['Costos fijos','','','',c.fixed],['Costo variable unitario','','','',c.variableUnit],['Punto equilibrio unidades','','','',c.pe??'No calculable'],['Punto equilibrio ventas','','','',c.pe===null?'No calculable':c.pe*c.price]);csvDownload('costos_produccion_15_ingredientes.csv',rows)});
+const defaultStages=['Recepción de materia prima','Selección y clasificación','Lavado','Desinfección','Enjuague','Pelado','Corte o troceado','Escaldado','Despulpado o molienda','Formulación y mezclado','Cocción o concentración','Envasado','Tratamiento térmico','Enfriamiento','Almacenamiento'];
+function loadDemoBalance(){ $('numEtapas').value='15';$('entradaInicial').value=10;buildStages();let outs=[9.8,9.5,9.3,9.2,8.9,8.7,8.5,8.4,8.1,7.9,7.5,7.4,7.3,7.2,7.1];[...$('etapas').rows].forEach((tr,i)=>{tr.querySelector('.stage-in').value=i===0?10:outs[i-1];tr.querySelector('.stage-out').value=outs[i];tr.querySelector('.stage-note').value=['Materia prima recibida','Retiro de unidades dañadas','Eliminación de suciedad','Reducción de carga microbiana','Retiro de desinfectante residual','Separación de cáscara','Tamaño uniforme','Inactivación enzimática','Separación de pulpa','Adición de ingredientes','Reducción de humedad','Llenado de envases','Aplicación de calor','Descenso de temperatura','Producto terminado'][i];});calcBalance()}
+function buildStages(){let count=parseInt($('numEtapas').value)||15;$('etapas').innerHTML='';for(let i=0;i<count;i++){let tr=document.createElement('tr');tr.innerHTML=`<td>${i+1}</td><td><input class="stage-name" value="${defaultStages[i]||'Etapa '+(i+1)}"></td><td><input class="stage-in" type="number" min="0" step="any" value="${i===0?num('entradaInicial'):''}"></td><td><input class="stage-out" type="number" min="0" step="any"></td><td class="stage-loss">—</td><td class="stage-yield">—</td><td><input class="stage-note" placeholder="Opcional"></td>`;$('etapas').appendChild(tr);tr.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{if(inp.classList.contains('stage-in')||inp.classList.contains('stage-out'))updateStageRow(tr)}))}}
+function updateStageRow(tr){let a=parseFloat(tr.querySelector('.stage-in').value),b=parseFloat(tr.querySelector('.stage-out').value);if(Number.isFinite(a)&&Number.isFinite(b)){let loss=a-b;tr.querySelector('.stage-loss').textContent=fmt(loss);tr.querySelector('.stage-yield').textContent=a>0?fmt(b/a*100)+'%':'—';tr.querySelector('.stage-loss').className='stage-loss '+(loss<0?'bad':'')}}
+function calcBalance(){const rows=[...$('etapas').rows],unit=$('unidadBalance').value;let previous=num('entradaInicial'),initial=previous,totalLoss=0,first=true,final=0;const stages=[];rows.forEach((tr,i)=>{let inVal=parseFloat(tr.querySelector('.stage-in').value);if(!Number.isFinite(inVal))inVal=first?initial:previous;let outVal=parseFloat(tr.querySelector('.stage-out').value);if(!Number.isFinite(outVal))outVal=inVal;tr.querySelector('.stage-in').value=inVal;tr.querySelector('.stage-out').value=outVal;updateStageRow(tr);let loss=inVal-outVal;totalLoss+=loss;previous=outVal;final=outVal;stages.push({i:i+1,name:tr.querySelector('.stage-name').value||'Etapa '+(i+1),input:inVal,output:outVal,loss,yield:inVal>0?outVal/inVal*100:0,note:tr.querySelector('.stage-note').value});first=false});$('balEntrada').textContent=fmt(initial)+' '+unit;$('balFinal').textContent=fmt(final)+' '+unit;$('balResiduo').textContent=fmt(totalLoss)+' '+unit;$('balRend').textContent=initial>0?fmt(final/initial*100)+'%':'—';$('diagrama').innerHTML=stages.map(s=>`<div class="flowrow"><div class="flowbox"><strong>${s.i}. ${esc(s.name)}</strong>Entran: ${fmt(s.input)} ${unit}</div><div class="arrow">→</div><div class="flowbox"><strong>Salida útil: ${fmt(s.output)} ${unit}</strong>Rendimiento: ${fmt(s.yield)}%<div class="branch">Diferencia estimada: ${fmt(s.loss)} ${unit}${s.loss<0?' · entrada adicional / revisar dato':''}</div>${s.note?'<small>'+esc(s.note)+'</small>':''}</div></div>`).join('<div class="arrow">↓</div>');return stages}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('numEtapas').addEventListener('change',()=>{buildStages();});$('entradaInicial').addEventListener('input',()=>{const first=$('etapas').rows[0];if(first&&(!first.querySelector('.stage-in').value||first.querySelector('.stage-in').value==='10'))first.querySelector('.stage-in').value=num('entradaInicial')});$('calcBalance').addEventListener('click',calcBalance);$('demoBalance').addEventListener('click',loadDemoBalance);$('clearBalance').addEventListener('click',()=>{[...$('etapas').rows].forEach((tr,i)=>{tr.querySelector('.stage-in').value='';tr.querySelector('.stage-out').value='';tr.querySelector('.stage-loss').textContent='—';tr.querySelector('.stage-yield').textContent='—'});$('diagrama').innerHTML='';['balEntrada','balFinal','balResiduo','balRend'].forEach(id=>$(id).textContent='—')});$('exportBalance').addEventListener('click',()=>{let rows=[['Etapa','Nombre','Entrada','Salida útil','Diferencia/residuo','Rendimiento (%)','Observación']];[...$('etapas').rows].forEach((tr,i)=>rows.push([i+1,tr.querySelector('.stage-name').value,tr.querySelector('.stage-in').value,tr.querySelector('.stage-out').value,tr.querySelector('.stage-loss').textContent,tr.querySelector('.stage-yield').textContent,tr.querySelector('.stage-note').value]));csvDownload('balance_materia_15_etapas.csv',rows)});
+// Defaults and recalc shared formula -> cost outputs
+addIngredient({name:'Ingrediente 1',qty:0});initCostRows();buildStages();loadDemoBalance();drawChart('chartI',[],null,'Valores');drawChart('chartD',[],null,'Desviación');calcNutri(false);calcCostos();
+})();
+</script>
+</body>
+</html>
